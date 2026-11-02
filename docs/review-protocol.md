@@ -226,7 +226,7 @@ it):
   "lanes": {
     "codex": {
       "probe": "codex --version && codex login status",
-      "exec": "codex exec --cd {repo_root} --sandbox read-only --skip-git-repo-check --output-last-message {output_file} \"$(cat {prompt_file})\"",
+      "exec": "codex exec --cd {repo_root} --sandbox read-only --skip-git-repo-check --output-last-message {output_file} - < {prompt_file}",
       "guard": false,
       "models": "gpt-5.5"
     }
