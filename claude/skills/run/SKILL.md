@@ -442,7 +442,10 @@ Bash tool with `run_in_background: true`. Use the `read-only` sandbox — it
 structurally enforces the "do NOT modify source files" constraint that the Claude
 agents only get from the prompt. Capture the report with `--output-last-message`
 (raw stdout is a formatted transcript — header, token usage, streamed reasoning —
-not clean report markdown):
+not clean report markdown). Pass the prompt on stdin (`-` plus `< file`), not as
+`"$(cat file)"`: a non-interactive Codex otherwise reads extra input from an open
+stdin and can hang, and permission checks that refuse command substitution deny the
+`$(...)` form outright:
 
 ```bash
 # Phase 1 — Optimizer (launch in the same wave as the Claude Optimizer agents,
@@ -452,7 +455,7 @@ codex exec \
   --sandbox read-only \
   --skip-git-repo-check \
   --output-last-message "[repo_root]/.reviews/[branch_safe]/optimizer-codex.md" \
-  "$(cat /tmp/codex-optimizer-prompt.txt)" \
+  - < /tmp/codex-optimizer-prompt.txt \
   > "[repo_root]/.reviews/[branch_safe]/optimizer-codex.log" 2>&1
 ```
 
@@ -541,7 +544,7 @@ codex exec \
   --cd "[repo_root]" \
   --sandbox workspace-write \
   --skip-git-repo-check \
-  "$(cat /tmp/codex-lane-optimizer.txt)" \
+  - < /tmp/codex-lane-optimizer.txt \
   > "[repo_root]/.reviews/[branch_safe]/optimizer-codex-lane.log" 2>&1
 ```
 
@@ -824,7 +827,7 @@ Optimizer agents begin reviewing immediately on spawn. The lead waits for their 
      --sandbox read-only \
      --skip-git-repo-check \
      --output-last-message "[repo_root]/.reviews/[branch_safe]/skeptic-codex.md" \
-     "$(cat /tmp/codex-skeptic-prompt.txt)" \
+     - < /tmp/codex-skeptic-prompt.txt \
      > "[repo_root]/.reviews/[branch_safe]/skeptic-codex.log" 2>&1
    ```
 
